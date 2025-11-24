@@ -1,15 +1,15 @@
 package protoflow
 
 import (
-	runtimepkg "github.com/drblury/protoflow/internal/runtime"
-	configpkg "github.com/drblury/protoflow/internal/runtime/config"
-	errspkg "github.com/drblury/protoflow/internal/runtime/errors"
-	handlerpkg "github.com/drblury/protoflow/internal/runtime/handlers"
-	idspkg "github.com/drblury/protoflow/internal/runtime/ids"
-	jsoncodec "github.com/drblury/protoflow/internal/runtime/jsoncodec"
-	loggingpkg "github.com/drblury/protoflow/internal/runtime/logging"
-	metadatapkg "github.com/drblury/protoflow/internal/runtime/metadata"
-	transportpkg "github.com/drblury/protoflow/internal/runtime/transport"
+	runtimepkg "github.com/enercity/protoflow/internal/runtime"
+	configpkg "github.com/enercity/protoflow/internal/runtime/config"
+	errspkg "github.com/enercity/protoflow/internal/runtime/errors"
+	handlerpkg "github.com/enercity/protoflow/internal/runtime/handlers"
+	idspkg "github.com/enercity/protoflow/internal/runtime/ids"
+	jsoncodec "github.com/enercity/protoflow/internal/runtime/jsoncodec"
+	loggingpkg "github.com/enercity/protoflow/internal/runtime/logging"
+	metadatapkg "github.com/enercity/protoflow/internal/runtime/metadata"
+	transportpkg "github.com/enercity/protoflow/internal/runtime/transport"
 	"google.golang.org/protobuf/proto"
 )
 

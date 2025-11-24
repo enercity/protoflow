@@ -8,8 +8,8 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message"
 	"google.golang.org/protobuf/proto"
 
-	configpkg "github.com/drblury/protoflow/internal/runtime/config"
-	loggingpkg "github.com/drblury/protoflow/internal/runtime/logging"
+	configpkg "github.com/enercity/protoflow/internal/runtime/config"
+	loggingpkg "github.com/enercity/protoflow/internal/runtime/logging"
 )
 
 type testPublisher struct {

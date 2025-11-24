@@ -1,10 +1,10 @@
 # Protoflow
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/drblury/protoflow.svg)](https://pkg.go.dev/github.com/drblury/protoflow)
-[![Go Report Card](https://goreportcard.com/badge/github.com/drblury/protoflow)](https://goreportcard.com/report/github.com/drblury/protoflow)
-[![CI](https://github.com/DrBlury/protoflow/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/DrBlury/protoflow/actions/workflows/ci.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/enercity/protoflow.svg)](https://pkg.go.dev/github.com/enercity/protoflow)
+[![Go Report Card](https://goreportcard.com/badge/github.com/enercity/protoflow)](https://goreportcard.com/report/github.com/enercity/protoflow)
+[![CI](https://github.com/enercity/protoflow/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/enercity/protoflow/actions/workflows/ci.yml)
 [![Coverage](https://codecov.io/gh/DrBlury/protoflow/branch/main/graph/badge.svg)](https://codecov.io/gh/DrBlury/protoflow)
-[![Latest Tag](https://img.shields.io/github/v/tag/DrBlury/protoflow?sort=semver&label=latest%20tag)](https://github.com/DrBlury/protoflow/tags)
+[![Latest Tag](https://img.shields.io/github/v/tag/DrBlury/protoflow?sort=semver&label=latest%20tag)](https://github.com/enercity/protoflow/tags)
 [![License](https://img.shields.io/github/license/DrBlury/protoflow)](LICENSE)
 
 **Stop writing plumbing. Start shipping features.**
@@ -23,7 +23,7 @@ Whether you are using Protobufs or JSON, Protoflow provides a type-safe, product
 
 ## Quick Start
 
-1. **Install**: `go get github.com/drblury/protoflow` (Go 1.25+).
+1. **Install**: `go get github.com/enercity/protoflow` (Go 1.25+).
 2. **Configure**: Set up `protoflow.Config`.
 3. **Launch**: Create a `Service`, register your handlers, and `Start`.
 

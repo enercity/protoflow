@@ -8,8 +8,8 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message"
 	"google.golang.org/protobuf/types/known/structpb"
 
-	errspkg "github.com/drblury/protoflow/internal/runtime/errors"
-	metadatapkg "github.com/drblury/protoflow/internal/runtime/metadata"
+	errspkg "github.com/enercity/protoflow/internal/runtime/errors"
+	metadatapkg "github.com/enercity/protoflow/internal/runtime/metadata"
 )
 
 type publisherTestContextKey struct{}

@@ -9,7 +9,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-nats/v2/pkg/nats"
 	"github.com/ThreeDotsLabs/watermill/message"
-	"github.com/drblury/protoflow/internal/runtime/config"
+	"github.com/enercity/protoflow/internal/runtime/config"
 	natsgo "github.com/nats-io/nats.go"
 )
 

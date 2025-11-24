@@ -5,7 +5,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
 
-	"github.com/drblury/protoflow/internal/runtime/config"
+	"github.com/enercity/protoflow/internal/runtime/config"
 )
 
 var (

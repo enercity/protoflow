@@ -16,7 +16,7 @@ import (
 	amazonsqs "github.com/aws/aws-sdk-go-v2/service/sqs"
 	transport "github.com/aws/smithy-go/endpoints"
 
-	"github.com/drblury/protoflow/internal/runtime/config"
+	"github.com/enercity/protoflow/internal/runtime/config"
 )
 
 var (

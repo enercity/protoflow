@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/ThreeDotsLabs/watermill/message"
-	"github.com/drblury/protoflow"
+	"github.com/enercity/protoflow"
 )
 
 var ErrTemporary = errors.New("temporary error")

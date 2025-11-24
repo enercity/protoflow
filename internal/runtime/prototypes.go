@@ -1,7 +1,7 @@
 package runtime
 
 import (
-	handlerpkg "github.com/drblury/protoflow/internal/runtime/handlers"
+	handlerpkg "github.com/enercity/protoflow/internal/runtime/handlers"
 	"google.golang.org/protobuf/proto"
 )
 

@@ -10,9 +10,9 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message/router/plugin"
 	"google.golang.org/protobuf/proto"
 
-	configpkg "github.com/drblury/protoflow/internal/runtime/config"
-	loggingpkg "github.com/drblury/protoflow/internal/runtime/logging"
-	transportpkg "github.com/drblury/protoflow/internal/runtime/transport"
+	configpkg "github.com/enercity/protoflow/internal/runtime/config"
+	loggingpkg "github.com/enercity/protoflow/internal/runtime/logging"
+	transportpkg "github.com/enercity/protoflow/internal/runtime/transport"
 )
 
 var routerRun = func(router *message.Router, ctx context.Context) error {

@@ -16,9 +16,9 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
-	configpkg "github.com/drblury/protoflow/internal/runtime/config"
-	loggingpkg "github.com/drblury/protoflow/internal/runtime/logging"
-	transportpkg "github.com/drblury/protoflow/internal/runtime/transport"
+	configpkg "github.com/enercity/protoflow/internal/runtime/config"
+	loggingpkg "github.com/enercity/protoflow/internal/runtime/logging"
+	transportpkg "github.com/enercity/protoflow/internal/runtime/transport"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
 )

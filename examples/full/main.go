@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/ThreeDotsLabs/watermill/message"
-	"github.com/drblury/protoflow"
-	"github.com/drblury/protoflow/examples/models"
+	"github.com/enercity/protoflow"
+	"github.com/enercity/protoflow/examples/models"
 )
 
 func main() {

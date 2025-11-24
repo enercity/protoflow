@@ -9,13 +9,13 @@ import (
 
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
-	configpkg "github.com/drblury/protoflow/internal/runtime/config"
+	configpkg "github.com/enercity/protoflow/internal/runtime/config"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
 
-	idspkg "github.com/drblury/protoflow/internal/runtime/ids"
-	loggingpkg "github.com/drblury/protoflow/internal/runtime/logging"
+	idspkg "github.com/enercity/protoflow/internal/runtime/ids"
+	loggingpkg "github.com/enercity/protoflow/internal/runtime/logging"
 )
 
 func TestCorrelationIDMiddleware(t *testing.T) {

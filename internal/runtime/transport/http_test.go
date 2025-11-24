@@ -10,7 +10,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-http/v2/pkg/http"
 	"github.com/ThreeDotsLabs/watermill/message"
-	"github.com/drblury/protoflow/internal/runtime/config"
+	"github.com/enercity/protoflow/internal/runtime/config"
 )
 
 func getFreePort() (int, error) {

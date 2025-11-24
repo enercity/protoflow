@@ -1,8 +1,8 @@
 package runtime
 
 import (
-	errspkg "github.com/drblury/protoflow/internal/runtime/errors"
-	handlerpkg "github.com/drblury/protoflow/internal/runtime/handlers"
+	errspkg "github.com/enercity/protoflow/internal/runtime/errors"
+	handlerpkg "github.com/enercity/protoflow/internal/runtime/handlers"
 )
 
 // RegisterJSONHandler converts the typed JSON handler into a Watermill handler and registers it.

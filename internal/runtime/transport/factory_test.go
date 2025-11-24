@@ -16,7 +16,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 
-	"github.com/drblury/protoflow/internal/runtime/config"
+	"github.com/enercity/protoflow/internal/runtime/config"
 )
 
 func TestKafkaTransportReturnsPublisherAndSubscriber(t *testing.T) {

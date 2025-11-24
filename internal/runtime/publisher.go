@@ -9,9 +9,9 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
-	errspkg "github.com/drblury/protoflow/internal/runtime/errors"
-	idspkg "github.com/drblury/protoflow/internal/runtime/ids"
-	metadatapkg "github.com/drblury/protoflow/internal/runtime/metadata"
+	errspkg "github.com/enercity/protoflow/internal/runtime/errors"
+	idspkg "github.com/enercity/protoflow/internal/runtime/ids"
+	metadatapkg "github.com/enercity/protoflow/internal/runtime/metadata"
 )
 
 var protoJSONMarshalOptions = protojson.MarshalOptions{

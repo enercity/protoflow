@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	loggingpkg "github.com/drblury/protoflow/internal/runtime/logging"
+	loggingpkg "github.com/enercity/protoflow/internal/runtime/logging"
 )
 
 func TestEntryServiceLogger(t *testing.T) {

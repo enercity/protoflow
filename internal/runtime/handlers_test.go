@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/ThreeDotsLabs/watermill/message"
-	handlerpkg "github.com/drblury/protoflow/internal/runtime/handlers"
-	idspkg "github.com/drblury/protoflow/internal/runtime/ids"
+	handlerpkg "github.com/enercity/protoflow/internal/runtime/handlers"
+	idspkg "github.com/enercity/protoflow/internal/runtime/ids"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 

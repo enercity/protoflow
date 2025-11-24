@@ -1,8 +1,8 @@
 package runtime
 
 import (
-	errspkg "github.com/drblury/protoflow/internal/runtime/errors"
-	handlerpkg "github.com/drblury/protoflow/internal/runtime/handlers"
+	errspkg "github.com/enercity/protoflow/internal/runtime/errors"
+	handlerpkg "github.com/enercity/protoflow/internal/runtime/handlers"
 	"google.golang.org/protobuf/proto"
 )
 

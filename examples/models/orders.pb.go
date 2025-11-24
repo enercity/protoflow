@@ -136,7 +136,7 @@ const file_examples_models_orders_proto_rawDesc = "" +
 	"\bcustomer\x18\x02 \x01(\tR\bcustomer\"C\n" +
 	"\x0eOrderProcessed\x12\x19\n" +
 	"\border_id\x18\x01 \x01(\tR\aorderId\x12\x16\n" +
-	"\x06status\x18\x02 \x01(\tR\x06statusB.Z,github.com/drblury/protoflow/examples/modelsb\x06proto3"
+	"\x06status\x18\x02 \x01(\tR\x06statusB.Z,github.com/enercity/protoflow/examples/modelsb\x06proto3"
 
 var (
 	file_examples_models_orders_proto_rawDescOnce sync.Once

@@ -15,8 +15,8 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"google.golang.org/protobuf/encoding/protojson"
 
-	idspkg "github.com/drblury/protoflow/internal/runtime/ids"
-	loggingpkg "github.com/drblury/protoflow/internal/runtime/logging"
+	idspkg "github.com/enercity/protoflow/internal/runtime/ids"
+	loggingpkg "github.com/enercity/protoflow/internal/runtime/logging"
 )
 
 // MiddlewareBuilder constructs a handler middleware using the provided service instance.

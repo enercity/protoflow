@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	handlerpkg "github.com/drblury/protoflow/internal/runtime/handlers"
+	handlerpkg "github.com/enercity/protoflow/internal/runtime/handlers"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 

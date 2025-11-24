@@ -7,7 +7,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message"
 	"google.golang.org/protobuf/proto"
 
-	errspkg "github.com/drblury/protoflow/internal/runtime/errors"
+	errspkg "github.com/enercity/protoflow/internal/runtime/errors"
 )
 
 type handlerRegistration struct {

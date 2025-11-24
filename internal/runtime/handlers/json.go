@@ -8,11 +8,11 @@ import (
 
 	"github.com/ThreeDotsLabs/watermill/message"
 
-	errspkg "github.com/drblury/protoflow/internal/runtime/errors"
-	idspkg "github.com/drblury/protoflow/internal/runtime/ids"
-	jsoncodec "github.com/drblury/protoflow/internal/runtime/jsoncodec"
-	loggingpkg "github.com/drblury/protoflow/internal/runtime/logging"
-	metadatapkg "github.com/drblury/protoflow/internal/runtime/metadata"
+	errspkg "github.com/enercity/protoflow/internal/runtime/errors"
+	idspkg "github.com/enercity/protoflow/internal/runtime/ids"
+	jsoncodec "github.com/enercity/protoflow/internal/runtime/jsoncodec"
+	loggingpkg "github.com/enercity/protoflow/internal/runtime/logging"
+	metadatapkg "github.com/enercity/protoflow/internal/runtime/metadata"
 )
 
 // JSONHandlerRegistration wires a typed JSON handler to the router.

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package models;
 
-option go_package = "github.com/drblury/protoflow/examples/models";
+option go_package = "github.com/enercity/protoflow/examples/models";
 
 message OrderCreated {
   string order_id = 1;

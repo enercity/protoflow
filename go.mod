@@ -1,4 +1,4 @@
-module github.com/drblury/protoflow
+module github.com/enercity/protoflow
 
 go 1.25.4
 

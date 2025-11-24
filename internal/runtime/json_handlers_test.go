@@ -5,8 +5,8 @@ import (
 	"errors"
 	"testing"
 
-	errspkg "github.com/drblury/protoflow/internal/runtime/errors"
-	handlerpkg "github.com/drblury/protoflow/internal/runtime/handlers"
+	errspkg "github.com/enercity/protoflow/internal/runtime/errors"
+	handlerpkg "github.com/enercity/protoflow/internal/runtime/handlers"
 )
 
 func TestRegisterJSONHandlerValidations(t *testing.T) {

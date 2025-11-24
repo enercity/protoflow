@@ -10,9 +10,9 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
-	errspkg "github.com/drblury/protoflow/internal/runtime/errors"
-	loggingpkg "github.com/drblury/protoflow/internal/runtime/logging"
-	metadatapkg "github.com/drblury/protoflow/internal/runtime/metadata"
+	errspkg "github.com/enercity/protoflow/internal/runtime/errors"
+	loggingpkg "github.com/enercity/protoflow/internal/runtime/logging"
+	metadatapkg "github.com/enercity/protoflow/internal/runtime/metadata"
 )
 
 // ProtoHandlerRegistration configures a typed protobuf handler that automatically
