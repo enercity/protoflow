@@ -495,8 +495,8 @@ func TestAwsSubscriberQueueNameGenerator(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error generating queue name: %v", err)
 	}
-	if name != "topic-subscriber" {
-		t.Fatalf("expected queue name 'topic-subscriber', got '%s'", name)
+	if name != "topic" {
+		t.Fatalf("expected queue name 'topic', got '%s'", name)
 	}
 
 	// Test generator error
@@ -620,15 +620,15 @@ func TestCreateAwsSubscriber_EndpointError(t *testing.T) {
 }
 
 func TestMakeSqsQueueNameGenerator(t *testing.T) {
-	gen := makeSqsQueueNameGenerator("sub")
+	gen := makeSqsQueueNameGenerator()
 
 	// Valid ARN
 	name, err := gen(context.Background(), "arn:aws:sns:us-east-1:123456789012:MyTopic")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if name != "MyTopic-sub" {
-		t.Fatalf("expected MyTopic-sub, got %s", name)
+	if name != "MyTopic" {
+		t.Fatalf("expected MyTopic, got %s", name)
 	}
 
 	// Invalid ARN
