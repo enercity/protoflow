@@ -16,6 +16,8 @@ Set `Config.PubSubSystem` to one of the built-in transports and configure the re
 | `AWSAccessKeyID` | Explicit credentials (optional) |
 | `AWSSecretAccessKey` | Explicit credentials (optional) |
 
+> **Note:** Protoflow expects all AWS resources (SNS topics, SQS queues, SNS→SQS subscriptions, and queue policies) to be provisioned via Terraform or other IaC tools. It will **not** create them at runtime.
+
 ### Go Channel (`"channel"`)
 
 | Field | Purpose |

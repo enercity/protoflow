@@ -130,18 +130,23 @@ func createAwsSubscriber(conf *config.Config, logger watermill.LoggerAdapter, cf
 		return nil, err
 	}
 
+	// AWS resources (SNS topics, SQS queues, subscriptions, policies) must be
+	// provisioned via Terraform/IaC. Protoflow never creates them at runtime.
 	subscriberConfig := sns.SubscriberConfig{
-		AWSConfig:            *cfg,
-		OptFns:               snsOpts,
-		TopicResolver:        topicResolver,
-		GenerateSqsQueueName: makeSqsQueueNameGenerator(),
+		AWSConfig:                  *cfg,
+		OptFns:                     snsOpts,
+		TopicResolver:              topicResolver,
+		GenerateSqsQueueName:       makeSqsQueueNameGenerator(),
+		DoNotCreateSqsSubscription: true,
+		DoNotSetQueueAccessPolicy:  true,
 	}
 
 	return SNSSubscriberFactory(
 		subscriberConfig,
 		sqs.SubscriberConfig{
-			AWSConfig: *cfg,
-			OptFns:    sqsOpts,
+			AWSConfig:                   *cfg,
+			OptFns:                      sqsOpts,
+			DoNotCreateQueueIfNotExists: true,
 		},
 		logger,
 	)
@@ -224,10 +229,13 @@ func buildPublisherConfig(conf *config.Config, cfg *aws.Config, topicResolver sn
 		return sns.PublisherConfig{}, err
 	}
 
+	// AWS resources (SNS topics) must be provisioned via Terraform/IaC.
+	// Protoflow never creates them at runtime.
 	publisherConfig := sns.PublisherConfig{
-		TopicResolver: topicResolver,
-		AWSConfig:     *cfg,
-		Marshaler:     sns.DefaultMarshalerUnmarshaler{},
+		TopicResolver:               topicResolver,
+		AWSConfig:                   *cfg,
+		Marshaler:                   sns.DefaultMarshalerUnmarshaler{},
+		DoNotCreateTopicIfNotExists: true,
 	}
 
 	if endpoint != nil {
