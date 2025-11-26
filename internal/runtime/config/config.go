@@ -9,28 +9,8 @@ import (
 // transport only uses the keys that are relevant to it.
 type Config struct {
 	// PubSubSystem selects the backing message infrastructure. Supported values:
-	// "kafka", "rabbitmq", or "aws" (SNS/SQS).
+	// "aws" (SNS/SQS) or "channel" (in-memory).
 	PubSubSystem string
-
-	// Kafka configuration.
-	KafkaBrokers       []string
-	KafkaClientID      string
-	KafkaConsumerGroup string
-
-	// RabbitMQ configuration.
-	RabbitMQURL string
-
-	// NATS configuration.
-	NATSURL string
-
-	// HTTP configuration.
-	HTTPServerAddress string
-	// HTTPPublisherURL is the base URL where messages will be sent.
-	HTTPPublisherURL string
-
-	// I/O configuration.
-	// IOFile is the path to the file used for persistence.
-	IOFile string
 
 	// PoisonQueue receives messages that cannot be processed even after retries.
 	PoisonQueue string

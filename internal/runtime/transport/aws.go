@@ -133,9 +133,7 @@ func createAwsSubscriber(conf *config.Config, logger watermill.LoggerAdapter, cf
 	}
 
 	subscriberConfig := sns.SubscriberConfig{
-		AWSConfig: aws.Config{
-			Credentials: aws.AnonymousCredentials{},
-		},
+		AWSConfig:            *cfg,
 		OptFns:               snsOpts,
 		TopicResolver:        topicResolver,
 		GenerateSqsQueueName: makeSqsQueueNameGenerator(name),

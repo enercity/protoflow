@@ -21,10 +21,8 @@ func main() {
 	logger := protoflow.NewSlogServiceLogger(baseLogger)
 
 	cfg := &protoflow.Config{
-		PubSubSystem:       "kafka",
-		KafkaBrokers:       []string{"localhost:9092"},
-		KafkaConsumerGroup: "simple-example",
-		PoisonQueue:        "simple.poison",
+		PubSubSystem: "channel",
+		PoisonQueue:  "simple.poison",
 	}
 
 	// Define a custom retry middleware that only retries on ErrTemporary
@@ -82,7 +80,7 @@ func createHandler(logger protoflow.ServiceLogger) func(msg *message.Message) ([
 			"metadata": msg.Metadata,
 		})
 
-		ack := message.NewMessage(protoflow.CreateULID(), []byte("acknowledged"))
+		ack := message.NewMessage(protoflow.CreateUUID(), []byte("acknowledged"))
 		ack.Metadata = message.Metadata{
 			"event_source":         "simple_example",
 			"event_message_schema": "example.AckV1",

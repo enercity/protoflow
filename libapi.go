@@ -1,11 +1,12 @@
 package protoflow
 
 import (
+	"github.com/google/uuid"
+
 	runtimepkg "github.com/enercity/protoflow/internal/runtime"
 	configpkg "github.com/enercity/protoflow/internal/runtime/config"
 	errspkg "github.com/enercity/protoflow/internal/runtime/errors"
 	handlerpkg "github.com/enercity/protoflow/internal/runtime/handlers"
-	idspkg "github.com/enercity/protoflow/internal/runtime/ids"
 	jsoncodec "github.com/enercity/protoflow/internal/runtime/jsoncodec"
 	loggingpkg "github.com/enercity/protoflow/internal/runtime/logging"
 	metadatapkg "github.com/enercity/protoflow/internal/runtime/metadata"
@@ -87,9 +88,12 @@ var (
 	NewSlogServiceLogger = loggingpkg.NewSlogServiceLogger
 
 	NewMetadata = metadatapkg.New
-
-	CreateULID = idspkg.CreateULID
 )
+
+// CreateUUID returns a new random UUID v4 string.
+func CreateUUID() string {
+	return uuid.New().String()
+}
 
 func RegisterJSONHandler[T any, O any](svc *Service, cfg JSONHandlerRegistration[T, O]) error {
 	return runtimepkg.RegisterJSONHandler[T, O](svc, cfg)

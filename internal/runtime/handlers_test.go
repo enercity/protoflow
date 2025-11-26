@@ -7,7 +7,7 @@ import (
 
 	"github.com/ThreeDotsLabs/watermill/message"
 	handlerpkg "github.com/enercity/protoflow/internal/runtime/handlers"
-	idspkg "github.com/enercity/protoflow/internal/runtime/ids"
+	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
@@ -180,7 +180,7 @@ func TestRegisterProtoHandler_Validation(t *testing.T) {
 
 	// Trigger handler
 	handler := svc.router.Handlers()["validated"]
-	msg := message.NewMessage(idspkg.CreateULID(), []byte("{}"))
+	msg := message.NewMessage(uuid.New().String(), []byte("{}"))
 	_, err = handler(msg)
 	if err == nil {
 		t.Fatal("expected validation error")

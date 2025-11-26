@@ -5,12 +5,8 @@ import (
 	"testing"
 
 	"github.com/ThreeDotsLabs/watermill"
-	"github.com/ThreeDotsLabs/watermill-amqp/v3/pkg/amqp"
 	"github.com/ThreeDotsLabs/watermill-aws/sns"
 	"github.com/ThreeDotsLabs/watermill-aws/sqs"
-	"github.com/ThreeDotsLabs/watermill-http/v2/pkg/http"
-	"github.com/ThreeDotsLabs/watermill-kafka/v3/pkg/kafka"
-	"github.com/ThreeDotsLabs/watermill-nats/v2/pkg/nats"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -18,81 +14,6 @@ import (
 
 	"github.com/enercity/protoflow/internal/runtime/config"
 )
-
-func TestKafkaTransportReturnsPublisherAndSubscriber(t *testing.T) {
-	origPub := KafkaPublisherFactory
-	origSub := KafkaSubscriberFactory
-	t.Cleanup(func() {
-		KafkaPublisherFactory = origPub
-		KafkaSubscriberFactory = origSub
-	})
-
-	pub := &testPublisher{}
-	sub := &testSubscriber{}
-
-	KafkaPublisherFactory = func(cfg kafka.PublisherConfig, logger watermill.LoggerAdapter) (message.Publisher, error) {
-		if len(cfg.Brokers) != 1 || cfg.Brokers[0] != "broker" {
-			t.Fatalf("unexpected brokers: %#v", cfg.Brokers)
-		}
-		return pub, nil
-	}
-	KafkaSubscriberFactory = func(cfg kafka.SubscriberConfig, logger watermill.LoggerAdapter) (message.Subscriber, error) {
-		if cfg.ConsumerGroup != "group" {
-			t.Fatalf("unexpected consumer group %s", cfg.ConsumerGroup)
-		}
-		return sub, nil
-	}
-
-	transport, err := kafkaTransport(&config.Config{KafkaBrokers: []string{"broker"}, KafkaConsumerGroup: "group"}, watermill.NopLogger{})
-	if err != nil {
-		t.Fatalf("unexpected kafka transport error: %v", err)
-	}
-	if transport.Publisher != pub || transport.Subscriber != sub {
-		t.Fatal("expected kafka transport to expose publisher and subscriber")
-	}
-}
-
-func TestRabbitTransportReturnsPublisherAndSubscriber(t *testing.T) {
-	origConn := AmqpConnectionFactory
-	origPub := AmqpPublisherFactory
-	origSub := AmqpSubscriberFactory
-	t.Cleanup(func() {
-		AmqpConnectionFactory = origConn
-		AmqpPublisherFactory = origPub
-		AmqpSubscriberFactory = origSub
-	})
-
-	conn := &amqp.ConnectionWrapper{}
-	pub := &testPublisher{}
-	sub := &testSubscriber{}
-
-	AmqpConnectionFactory = func(cfg amqp.ConnectionConfig, logger watermill.LoggerAdapter) (*amqp.ConnectionWrapper, error) {
-		if cfg.AmqpURI == "" {
-			t.Fatal("expected AMQP URI to be set")
-		}
-		return conn, nil
-	}
-	AmqpPublisherFactory = func(cfg amqp.Config, logger watermill.LoggerAdapter, c *amqp.ConnectionWrapper) (message.Publisher, error) {
-		if c != conn {
-			t.Fatalf("unexpected connection instance")
-		}
-		return pub, nil
-	}
-	AmqpSubscriberFactory = func(cfg amqp.Config, logger watermill.LoggerAdapter, c *amqp.ConnectionWrapper) (message.Subscriber, error) {
-		if c != conn {
-			t.Fatalf("unexpected connection instance")
-		}
-		return sub, nil
-	}
-
-	transport, err := rabbitTransport(&config.Config{RabbitMQURL: "amqp://guest"}, watermill.NopLogger{})
-	if err != nil {
-		t.Fatalf("unexpected rabbit transport error: %v", err)
-	}
-	if transport.Publisher != pub || transport.Subscriber != sub {
-		t.Fatal("expected rabbit transport components to be returned")
-	}
-}
 
 func TestAwsTransportUsesCustomFactories(t *testing.T) {
 	origLoader := AWSDefaultConfigLoader
@@ -145,7 +66,7 @@ func TestDefaultFactoryBuild(t *testing.T) {
 		}
 	})
 
-	for _, tc := range []factoryBuildCase{kafkaFactoryCase(), rabbitFactoryCase(), awsFactoryCase(), natsFactoryCase(), channelFactoryCase(), ioFactoryCase(), httpFactoryCase()} {
+	for _, tc := range []factoryBuildCase{awsFactoryCase(), channelFactoryCase()} {
 		t.Run(tc.name, func(t *testing.T) {
 			cleanup, expectedPub, expectedSub := tc.setup(t)
 			if cleanup != nil {
@@ -159,63 +80,6 @@ func TestDefaultFactoryBuild(t *testing.T) {
 				t.Fatalf("expected %s transport to reuse stub components", tc.name)
 			}
 		})
-	}
-}
-
-func httpFactoryCase() factoryBuildCase {
-	return factoryBuildCase{
-		name: "http",
-		cfg:  &config.Config{PubSubSystem: "http", HTTPServerAddress: ":8080", HTTPPublisherURL: "http://localhost:8080"},
-		setup: func(t *testing.T) (func(), message.Publisher, message.Subscriber) {
-			t.Helper()
-			origPub := HTTPPublisherFactory
-			origSub := HTTPSubscriberFactory
-			pub := &testPublisher{}
-			sub := &testSubscriber{}
-			HTTPPublisherFactory = func(config http.PublisherConfig, logger watermill.LoggerAdapter) (message.Publisher, error) {
-				return pub, nil
-			}
-			HTTPSubscriberFactory = func(addr string, config http.SubscriberConfig, logger watermill.LoggerAdapter) (message.Subscriber, error) {
-				if addr != ":8080" {
-					t.Fatal("unexpected address")
-				}
-				return sub, nil
-			}
-			return func() {
-				HTTPPublisherFactory = origPub
-				HTTPSubscriberFactory = origSub
-			}, pub, sub
-		},
-	}
-}
-
-func natsFactoryCase() factoryBuildCase {
-	return factoryBuildCase{
-		name: "nats",
-		cfg:  &config.Config{PubSubSystem: "nats", NATSURL: "nats://localhost:4222"},
-		setup: func(t *testing.T) (func(), message.Publisher, message.Subscriber) {
-			t.Helper()
-			origPub := NATSPublisherFactory
-			origSub := NATSSubscriberFactory
-			pub := &testPublisher{}
-			sub := &testSubscriber{}
-			NATSPublisherFactory = func(cfg nats.PublisherConfig, logger watermill.LoggerAdapter) (message.Publisher, error) {
-				if cfg.URL != "nats://localhost:4222" {
-					t.Fatal("unexpected NATS URL")
-				}
-				return pub, nil
-			}
-			NATSSubscriberFactory = func(cfg nats.SubscriberConfig, logger watermill.LoggerAdapter) (message.Subscriber, error) {
-				if cfg.URL != "nats://localhost:4222" {
-					t.Fatal("unexpected NATS URL")
-				}
-				return sub, nil
-			}
-			return func() {
-				NATSPublisherFactory = origPub
-				NATSSubscriberFactory = origSub
-			}, pub, sub
-		},
 	}
 }
 
@@ -238,36 +102,6 @@ func channelFactoryCase() factoryBuildCase {
 	}
 }
 
-func ioFactoryCase() factoryBuildCase {
-	return factoryBuildCase{
-		name: "io",
-		cfg:  &config.Config{PubSubSystem: "io", IOFile: "test.log"},
-		setup: func(t *testing.T) (func(), message.Publisher, message.Subscriber) {
-			t.Helper()
-			origPub := IOPublisherFactory
-			origSub := IOSubscriberFactory
-			pub := &testPublisher{}
-			sub := &testSubscriber{}
-			IOPublisherFactory = func(filePath string, logger watermill.LoggerAdapter) (message.Publisher, error) {
-				if filePath != "test.log" {
-					t.Fatal("unexpected file path")
-				}
-				return pub, nil
-			}
-			IOSubscriberFactory = func(filePath string, logger watermill.LoggerAdapter) (message.Subscriber, error) {
-				if filePath != "test.log" {
-					t.Fatal("unexpected file path")
-				}
-				return sub, nil
-			}
-			return func() {
-				IOPublisherFactory = origPub
-				IOSubscriberFactory = origSub
-			}, pub, sub
-		},
-	}
-}
-
 func TestDefaultFactoryRequiresConfig(t *testing.T) {
 	if _, err := (defaultFactory{}).Build(context.Background(), nil, watermill.NopLogger{}); err == nil {
 		t.Fatal("expected error when config nil")
@@ -278,75 +112,6 @@ type factoryBuildCase struct {
 	name  string
 	cfg   *config.Config
 	setup func(t *testing.T) (cleanup func(), pub message.Publisher, sub message.Subscriber)
-}
-
-func kafkaFactoryCase() factoryBuildCase {
-	return factoryBuildCase{
-		name: "kafka",
-		cfg:  &config.Config{PubSubSystem: "kafka", KafkaBrokers: []string{"broker"}, KafkaConsumerGroup: "group"},
-		setup: func(t *testing.T) (func(), message.Publisher, message.Subscriber) {
-			t.Helper()
-			origPub := KafkaPublisherFactory
-			origSub := KafkaSubscriberFactory
-			pub := &testPublisher{}
-			sub := &testSubscriber{}
-			KafkaPublisherFactory = func(cfg kafka.PublisherConfig, logger watermill.LoggerAdapter) (message.Publisher, error) {
-				if len(cfg.Brokers) == 0 {
-					t.Fatal("expected brokers to be provided")
-				}
-				return pub, nil
-			}
-			KafkaSubscriberFactory = func(cfg kafka.SubscriberConfig, logger watermill.LoggerAdapter) (message.Subscriber, error) {
-				if cfg.ConsumerGroup == "" {
-					t.Fatal("expected consumer group to be provided")
-				}
-				return sub, nil
-			}
-			return func() {
-				KafkaPublisherFactory = origPub
-				KafkaSubscriberFactory = origSub
-			}, pub, sub
-		},
-	}
-}
-
-func rabbitFactoryCase() factoryBuildCase {
-	return factoryBuildCase{
-		name: "rabbitmq",
-		cfg:  &config.Config{PubSubSystem: "rabbitmq", RabbitMQURL: "amqp://guest"},
-		setup: func(t *testing.T) (func(), message.Publisher, message.Subscriber) {
-			t.Helper()
-			origConn := AmqpConnectionFactory
-			origPub := AmqpPublisherFactory
-			origSub := AmqpSubscriberFactory
-			conn := &amqp.ConnectionWrapper{}
-			pub := &testPublisher{}
-			sub := &testSubscriber{}
-			AmqpConnectionFactory = func(cfg amqp.ConnectionConfig, logger watermill.LoggerAdapter) (*amqp.ConnectionWrapper, error) {
-				if cfg.AmqpURI == "" {
-					t.Fatal("expected AMQP URI")
-				}
-				return conn, nil
-			}
-			AmqpPublisherFactory = func(cfg amqp.Config, logger watermill.LoggerAdapter, c *amqp.ConnectionWrapper) (message.Publisher, error) {
-				if c != conn {
-					t.Fatal("unexpected connection passed to publisher factory")
-				}
-				return pub, nil
-			}
-			AmqpSubscriberFactory = func(cfg amqp.Config, logger watermill.LoggerAdapter, c *amqp.ConnectionWrapper) (message.Subscriber, error) {
-				if c != conn {
-					t.Fatal("unexpected connection passed to subscriber factory")
-				}
-				return sub, nil
-			}
-			return func() {
-				AmqpConnectionFactory = origConn
-				AmqpPublisherFactory = origPub
-				AmqpSubscriberFactory = origSub
-			}, pub, sub
-		},
-	}
 }
 
 func awsFactoryCase() factoryBuildCase {

@@ -22,7 +22,7 @@ type Factory interface {
 }
 
 // DefaultFactory returns the built-in transport factory that knows how to
-// initialise Kafka, RabbitMQ, and AWS SNS/SQS transports.
+// initialise AWS SNS/SQS and in-memory channel transports.
 func DefaultFactory() Factory {
 	return defaultFactory{}
 }
@@ -35,21 +35,11 @@ func (defaultFactory) Build(ctx context.Context, conf *config.Config, logger wat
 	}
 
 	switch conf.PubSubSystem {
-	case "kafka":
-		return kafkaTransport(conf, logger)
-	case "rabbitmq":
-		return rabbitTransport(conf, logger)
 	case "aws":
 		return awsTransport(ctx, conf, logger)
-	case "nats":
-		return natsTransport(conf, logger)
 	case "channel":
 		return channelTransport(conf, logger)
-	case "io":
-		return ioTransport(conf, logger)
-	case "http":
-		return httpTransport(conf, logger)
 	default:
-		return Transport{}, fmt.Errorf("unsupported PubSubSystem, must be 'kafka', 'aws', 'rabbitmq', 'nats', 'channel', 'io' or 'http'")
+		return Transport{}, fmt.Errorf("unsupported PubSubSystem, must be 'aws' or 'channel'")
 	}
 }

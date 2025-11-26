@@ -159,6 +159,46 @@ func TestCreateAwsSubscriberFallbacks(t *testing.T) {
 	}
 }
 
+func TestCreateAwsSubscriberRegionPropagation(t *testing.T) {
+	origTopic := SNSTopicResolverFactory
+	origSub := SNSSubscriberFactory
+	t.Cleanup(func() {
+		SNSTopicResolverFactory = origTopic
+		SNSSubscriberFactory = origSub
+	})
+
+	SNSTopicResolverFactory = func(accountID, region string) (*sns.GenerateArnTopicResolver, error) {
+		return origTopic(accountID, region)
+	}
+
+	var capturedSNSConfig sns.SubscriberConfig
+	var capturedSQSConfig sqs.SubscriberConfig
+	SNSSubscriberFactory = func(cfg sns.SubscriberConfig, sqsCfg sqs.SubscriberConfig, _ watermill.LoggerAdapter) (message.Subscriber, error) {
+		capturedSNSConfig = cfg
+		capturedSQSConfig = sqsCfg
+		return &testSubscriber{}, nil
+	}
+
+	testRegion := "eu-west-1"
+	conf := &config.Config{AWSAccountID: "123456789012", AWSRegion: testRegion}
+	cfg := &aws.Config{Region: testRegion}
+
+	_, err := createAwsSubscriber(conf, watermill.NopLogger{}, cfg)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	// Verify that the SNS subscriber config has the correct region from the AWS config
+	if capturedSNSConfig.AWSConfig.Region != testRegion {
+		t.Fatalf("expected SNS subscriber AWSConfig.Region to be %q, got %q", testRegion, capturedSNSConfig.AWSConfig.Region)
+	}
+
+	// Verify that the SQS subscriber config also has the correct region
+	if capturedSQSConfig.AWSConfig.Region != testRegion {
+		t.Fatalf("expected SQS subscriber AWSConfig.Region to be %q, got %q", testRegion, capturedSQSConfig.AWSConfig.Region)
+	}
+}
+
 func TestCreateAwsSubscriberInvalidBaseEndpoint(t *testing.T) {
 	conf := &config.Config{}
 	cfg := &aws.Config{BaseEndpoint: aws.String("://bad")}
@@ -412,8 +452,10 @@ func TestAwsSubscriberQueueNameGenerator(t *testing.T) {
 	defer func() { SNSSubscriberFactory = origSub }()
 
 	var capturedCfg sns.SubscriberConfig
+	var capturedSqsCfg sqs.SubscriberConfig
 	SNSSubscriberFactory = func(cfg sns.SubscriberConfig, sqsCfg sqs.SubscriberConfig, logger watermill.LoggerAdapter) (message.Subscriber, error) {
 		capturedCfg = cfg
+		capturedSqsCfg = sqsCfg
 		return &testSubscriber{}, nil
 	}
 
@@ -432,6 +474,16 @@ func TestAwsSubscriberQueueNameGenerator(t *testing.T) {
 	_, err := awsTransport(context.Background(), &config.Config{AWSAccountID: "123"}, watermill.NopLogger{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
+	}
+
+	// Verify region is properly propagated to SNS subscriber config
+	if capturedCfg.AWSConfig.Region != "us-east-1" {
+		t.Fatalf("expected SNS subscriber config region 'us-east-1', got '%s'", capturedCfg.AWSConfig.Region)
+	}
+
+	// Verify region is properly propagated to SQS subscriber config
+	if capturedSqsCfg.AWSConfig.Region != "us-east-1" {
+		t.Fatalf("expected SQS subscriber config region 'us-east-1', got '%s'", capturedSqsCfg.AWSConfig.Region)
 	}
 
 	if capturedCfg.GenerateSqsQueueName == nil {

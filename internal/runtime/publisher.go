@@ -6,11 +6,11 @@ import (
 	"fmt"
 
 	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/google/uuid"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
 	errspkg "github.com/enercity/protoflow/internal/runtime/errors"
-	idspkg "github.com/enercity/protoflow/internal/runtime/ids"
 	metadatapkg "github.com/enercity/protoflow/internal/runtime/metadata"
 )
 
@@ -35,7 +35,7 @@ func NewMessageFromProto(event proto.Message, metadata metadatapkg.Metadata) (*m
 		return nil, fmt.Errorf("failed to marshal event payload: %w", err)
 	}
 
-	msg := message.NewMessage(idspkg.CreateULID(), payload)
+	msg := message.NewMessage(uuid.New().String(), payload)
 	msg.Metadata = metadatapkg.ToWatermill(metadata)
 	msg.Metadata["event_message_schema"] = fmt.Sprintf("%T", event)
 	return msg, nil

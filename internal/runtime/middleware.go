@@ -9,13 +9,13 @@ import (
 	"github.com/ThreeDotsLabs/watermill/components/metrics"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
+	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"google.golang.org/protobuf/encoding/protojson"
 
-	idspkg "github.com/enercity/protoflow/internal/runtime/ids"
 	loggingpkg "github.com/enercity/protoflow/internal/runtime/logging"
 )
 
@@ -217,7 +217,7 @@ func (s *Service) correlationIDMiddleware() message.HandlerMiddleware {
 	return func(h message.HandlerFunc) message.HandlerFunc {
 		return func(msg *message.Message) ([]*message.Message, error) {
 			if _, ok := msg.Metadata["correlation_id"]; !ok {
-				msg.Metadata["correlation_id"] = idspkg.CreateULID()
+				msg.Metadata["correlation_id"] = uuid.New().String()
 			}
 			return h(msg)
 		}

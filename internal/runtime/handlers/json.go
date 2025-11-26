@@ -7,9 +7,9 @@ import (
 	"reflect"
 
 	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/google/uuid"
 
 	errspkg "github.com/enercity/protoflow/internal/runtime/errors"
-	idspkg "github.com/enercity/protoflow/internal/runtime/ids"
 	jsoncodec "github.com/enercity/protoflow/internal/runtime/jsoncodec"
 	loggingpkg "github.com/enercity/protoflow/internal/runtime/logging"
 	metadatapkg "github.com/enercity/protoflow/internal/runtime/metadata"
@@ -119,7 +119,7 @@ func convertJSONOutputs[T any](outputs []JSONMessageOutput[T], fallback metadata
 		metadata = metadata.Clone()
 		metadata["event_message_schema"] = fmt.Sprintf("%T", out.Message)
 
-		msg := message.NewMessage(idspkg.CreateULID(), payload)
+		msg := message.NewMessage(uuid.New().String(), payload)
 		msg.Metadata = metadatapkg.ToWatermill(metadata)
 		result[i] = msg
 	}

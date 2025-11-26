@@ -27,8 +27,7 @@ func main() {
 	logger := protoflow.NewSlogServiceLogger(baseLogger)
 
 	cfg := &protoflow.Config{
-		PubSubSystem: "rabbitmq",
-		RabbitMQURL:  "amqp://guest:guest@localhost",
+		PubSubSystem: "channel",
 		PoisonQueue:  "orders.poison",
 	}
 

@@ -8,9 +8,9 @@ import (
 
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/google/uuid"
 
 	errspkg "github.com/enercity/protoflow/internal/runtime/errors"
-	idspkg "github.com/enercity/protoflow/internal/runtime/ids"
 	loggingpkg "github.com/enercity/protoflow/internal/runtime/logging"
 	metadatapkg "github.com/enercity/protoflow/internal/runtime/metadata"
 )
@@ -36,7 +36,7 @@ func TestBuildJSONHandlerProcessesPayload(t *testing.T) {
 		t.Fatalf("unexpected error building handler: %v", err)
 	}
 
-	msg := message.NewMessage(idspkg.CreateULID(), []byte(`{"id":42}`))
+	msg := message.NewMessage(uuid.New().String(), []byte(`{"id":42}`))
 	msg.Metadata = message.Metadata{"origin": "test"}
 
 	produced, err := handler(msg)
@@ -62,7 +62,7 @@ func TestBuildJSONHandlerUnmarshalError(t *testing.T) {
 		t.Fatalf("unexpected error building handler: %v", err)
 	}
 
-	msg := message.NewMessage(idspkg.CreateULID(), []byte(`{invalid-json`))
+	msg := message.NewMessage(uuid.New().String(), []byte(`{invalid-json`))
 	_, err = handler(msg)
 	if err == nil {
 		t.Fatal("expected unmarshal error")
@@ -77,7 +77,7 @@ func TestBuildJSONHandlerHandlerError(t *testing.T) {
 		t.Fatalf("unexpected error building handler: %v", err)
 	}
 
-	msg := message.NewMessage(idspkg.CreateULID(), []byte(`{"id":42}`))
+	msg := message.NewMessage(uuid.New().String(), []byte(`{"id":42}`))
 	_, err = handler(msg)
 	if err == nil {
 		t.Fatal("expected handler error")

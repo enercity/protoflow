@@ -7,12 +7,12 @@ import (
 
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/google/uuid"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	errspkg "github.com/enercity/protoflow/internal/runtime/errors"
-	idspkg "github.com/enercity/protoflow/internal/runtime/ids"
 	loggingpkg "github.com/enercity/protoflow/internal/runtime/logging"
 	metadatapkg "github.com/enercity/protoflow/internal/runtime/metadata"
 )
@@ -23,7 +23,7 @@ func TestBuildProtoHandlerProcessesPayload(t *testing.T) {
 	capturedMetadata := make([]metadatapkg.Metadata, 0, 1)
 	factory := func(msg proto.Message, metadata metadatapkg.Metadata) (*message.Message, error) {
 		capturedMetadata = append(capturedMetadata, metadata.Clone())
-		return message.NewMessage(idspkg.CreateULID(), []byte("ok")), nil
+		return message.NewMessage(uuid.New().String(), []byte("ok")), nil
 	}
 
 	handler, err := BuildProtoHandler(prototype, func(ctx context.Context, evt ProtoMessageContext[*structpb.Struct]) ([]ProtoMessageOutput, error) {
@@ -50,7 +50,7 @@ func TestBuildProtoHandlerProcessesPayload(t *testing.T) {
 		t.Fatalf("failed to marshal proto: %v", err)
 	}
 
-	msg := message.NewMessage(idspkg.CreateULID(), bytes)
+	msg := message.NewMessage(uuid.New().String(), bytes)
 	msg.Metadata = message.Metadata{"origin": "test"}
 
 	produced, err := handler(msg)
@@ -80,7 +80,7 @@ func TestBuildProtoHandlerUnmarshalError(t *testing.T) {
 		t.Fatalf("unexpected error building handler: %v", err)
 	}
 
-	msg := message.NewMessage(idspkg.CreateULID(), []byte(`{invalid-json`))
+	msg := message.NewMessage(uuid.New().String(), []byte(`{invalid-json`))
 	_, err = handler(msg)
 	if err == nil {
 		t.Fatal("expected unmarshal error")
@@ -101,7 +101,7 @@ func TestBuildProtoHandlerHandlerError(t *testing.T) {
 
 	payload := &structpb.Struct{}
 	bytes, _ := payload.MarshalJSON()
-	msg := message.NewMessage(idspkg.CreateULID(), bytes)
+	msg := message.NewMessage(uuid.New().String(), bytes)
 	_, err = handler(msg)
 	if err == nil {
 		t.Fatal("expected handler error")
@@ -124,7 +124,7 @@ func TestBuildProtoHandlerValidationFailure(t *testing.T) {
 
 	payload := &structpb.Struct{}
 	bytes, _ := payload.MarshalJSON()
-	msg := message.NewMessage(idspkg.CreateULID(), bytes)
+	msg := message.NewMessage(uuid.New().String(), bytes)
 	_, err = handler(msg)
 	if err == nil {
 		t.Fatal("expected validation error")
@@ -145,7 +145,7 @@ func TestBuildProtoHandlerFactoryFailure(t *testing.T) {
 
 	payload := &structpb.Struct{}
 	bytes, _ := payload.MarshalJSON()
-	msg := message.NewMessage(idspkg.CreateULID(), bytes)
+	msg := message.NewMessage(uuid.New().String(), bytes)
 	_, err = handler(msg)
 	if err == nil {
 		t.Fatal("expected factory error")
@@ -312,7 +312,7 @@ func TestBuildProtoHandler_NilMessageWithValidator(t *testing.T) {
 		return nil, nil
 	}, loggingpkg.NewWatermillServiceLogger(watermill.NopLogger{}))
 
-	msg := message.NewMessage(idspkg.CreateULID(), []byte("{}"))
+	msg := message.NewMessage(uuid.New().String(), []byte("{}"))
 	_, err := handler(msg)
 	if err == nil || err.Error() != "proto handler emitted nil message" {
 		t.Fatalf("expected nil message error, got %v", err)
@@ -388,7 +388,7 @@ func TestConvertProtoOutputs_FallbackMetadata(t *testing.T) {
 		if metadata["key"] != "value" {
 			return nil, errors.New("metadata not propagated")
 		}
-		return message.NewMessage(idspkg.CreateULID(), []byte("ok")), nil
+		return message.NewMessage(uuid.New().String(), []byte("ok")), nil
 	}
 	_, err := convertProtoOutputs(outputs, fallback, factory)
 	if err != nil {

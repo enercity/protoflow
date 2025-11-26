@@ -29,11 +29,9 @@ func newExampleLogger() protoflow.ServiceLogger {
 
 func buildConfig() *protoflow.Config {
 	return &protoflow.Config{
-		PubSubSystem:       "kafka",
-		KafkaBrokers:       []string{"localhost:9092"},
-		KafkaConsumerGroup: "full-example",
-		PoisonQueue:        "orders.poison",
-		RetryMaxRetries:    5,
+		PubSubSystem:    "channel",
+		PoisonQueue:     "orders.poison",
+		RetryMaxRetries: 5,
 	}
 }
 
@@ -116,7 +114,7 @@ func startSamplePublisher(ctx context.Context, svc *protoflow.Service) {
 				return
 			case <-ticker.C:
 				metadata := protoflow.Metadata{"event_source": "full-example"}
-				evt := &models.OrderCreated{OrderId: protoflow.CreateULID(), Customer: "demo"}
+				evt := &models.OrderCreated{OrderId: protoflow.CreateUUID(), Customer: "demo"}
 				_ = svc.PublishProto(context.Background(), "orders.created", evt, metadata)
 			}
 		}

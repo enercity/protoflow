@@ -9,10 +9,8 @@ import (
 	"time"
 
 	"github.com/ThreeDotsLabs/watermill"
-	"github.com/ThreeDotsLabs/watermill-amqp/v3/pkg/amqp"
 	"github.com/ThreeDotsLabs/watermill-aws/sns"
 	"github.com/ThreeDotsLabs/watermill-aws/sqs"
-	"github.com/ThreeDotsLabs/watermill-kafka/v3/pkg/kafka"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
@@ -31,53 +29,25 @@ func newTestLogger() loggingpkg.ServiceLogger {
 	return loggingpkg.NewSlogServiceLogger(newTestSlogLogger())
 }
 
-func TestNewServiceConfiguresKafka(t *testing.T) {
-
-	origPub := transportpkg.KafkaPublisherFactory
-	origSub := transportpkg.KafkaSubscriberFactory
-	t.Cleanup(func() {
-		transportpkg.KafkaPublisherFactory = origPub
-		transportpkg.KafkaSubscriberFactory = origSub
-	})
-	recordedPublishConfigs := 0
-	recordedSubscribeConfigs := 0
-	pub := &testPublisher{}
-	sub := &testSubscriber{}
-	transportpkg.KafkaPublisherFactory = func(config kafka.PublisherConfig, _ watermill.LoggerAdapter) (message.Publisher, error) {
-		recordedPublishConfigs++
-		return pub, nil
-	}
-	transportpkg.KafkaSubscriberFactory = func(config kafka.SubscriberConfig, _ watermill.LoggerAdapter) (message.Subscriber, error) {
-		recordedSubscribeConfigs++
-		if config.ConsumerGroup != "group" {
-			t.Fatalf("unexpected consumer group: %s", config.ConsumerGroup)
-		}
-		return sub, nil
-	}
-
+func TestNewServiceConfiguresChannel(t *testing.T) {
 	cfg := &configpkg.Config{
-		PubSubSystem:       "kafka",
-		KafkaBrokers:       []string{"b1"},
-		KafkaConsumerGroup: "group",
-		PoisonQueue:        "poison",
+		PubSubSystem: "channel",
+		PoisonQueue:  "poison",
 	}
 	logger := newTestLogger()
 	svc := NewService(cfg, logger, context.Background(), ServiceDependencies{})
 
-	if svc.publisher != pub {
-		t.Fatalf("expected kafka publisher to be assigned")
+	if svc.publisher == nil {
+		t.Fatal("expected channel publisher to be assigned")
 	}
-	if svc.subscriber != sub {
-		t.Fatalf("expected kafka subscriber to be assigned")
+	if svc.subscriber == nil {
+		t.Fatal("expected channel subscriber to be assigned")
 	}
 	if svc.Conf != cfg {
-		t.Fatalf("service config not set")
+		t.Fatal("service config not set")
 	}
 	if svc.router == nil {
 		t.Fatal("router should not be nil")
-	}
-	if recordedPublishConfigs == 0 || recordedSubscribeConfigs == 0 {
-		t.Fatal("factories were not invoked")
 	}
 }
 
@@ -101,59 +71,6 @@ func TestNewService_MiddlewareBuilderError(t *testing.T) {
 	NewService(cfg, logger, context.Background(), ServiceDependencies{
 		Middlewares: []MiddlewareRegistration{badMiddleware},
 	})
-}
-
-func TestNewServiceConfiguresRabbitMQ(t *testing.T) {
-
-	origConn := transportpkg.AmqpConnectionFactory
-	origPub := transportpkg.AmqpPublisherFactory
-	origSub := transportpkg.AmqpSubscriberFactory
-	t.Cleanup(func() {
-		transportpkg.AmqpConnectionFactory = origConn
-		transportpkg.AmqpPublisherFactory = origPub
-		transportpkg.AmqpSubscriberFactory = origSub
-	})
-
-	connCalls := 0
-	transportpkg.AmqpConnectionFactory = func(config amqp.ConnectionConfig, _ watermill.LoggerAdapter) (*amqp.ConnectionWrapper, error) {
-		connCalls++
-		if config.AmqpURI != "amqp://guest:guest@localhost" {
-			t.Fatalf("unexpected amqp uri: %s", config.AmqpURI)
-		}
-		return &amqp.ConnectionWrapper{}, nil
-	}
-
-	pub := &testPublisher{}
-	sub := &testSubscriber{}
-	transportpkg.AmqpPublisherFactory = func(cfg amqp.Config, _ watermill.LoggerAdapter, conn *amqp.ConnectionWrapper) (message.Publisher, error) {
-		if conn == nil {
-			t.Fatal("expected connection to be provided")
-		}
-		return pub, nil
-	}
-	transportpkg.AmqpSubscriberFactory = func(cfg amqp.Config, _ watermill.LoggerAdapter, conn *amqp.ConnectionWrapper) (message.Subscriber, error) {
-		if conn == nil {
-			t.Fatal("expected connection to be provided")
-		}
-		return sub, nil
-	}
-
-	cfg := &configpkg.Config{
-		PubSubSystem: "rabbitmq",
-		RabbitMQURL:  "amqp://guest:guest@localhost",
-		PoisonQueue:  "poison",
-	}
-	svc := NewService(cfg, newTestLogger(), context.Background(), ServiceDependencies{})
-
-	if svc.publisher != pub {
-		t.Fatalf("expected rabbit publisher assignment")
-	}
-	if svc.subscriber != sub {
-		t.Fatalf("expected rabbit subscriber assignment")
-	}
-	if connCalls != 1 {
-		t.Fatalf("expected single connection initialisation, got %d", connCalls)
-	}
 }
 
 func TestNewServiceConfiguresAWS(t *testing.T) {
@@ -242,7 +159,7 @@ func TestNewServicePanicsWhenRouterFails(t *testing.T) {
 			t.Fatal("expected panic when middleware registration fails")
 		}
 	}()
-	NewService(&configpkg.Config{PubSubSystem: "kafka"}, logger, context.Background(), deps)
+	NewService(&configpkg.Config{PubSubSystem: "channel"}, logger, context.Background(), deps)
 }
 
 func TestMustProtoMessagePanicsOnError(t *testing.T) {

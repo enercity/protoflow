@@ -6,20 +6,6 @@ Protoflow is designed to be flexible. Centralize your broker wiring, middleware 
 
 Set `Config.PubSubSystem` to one of the built-in transports and configure the relevant fields.
 
-### Kafka (`"kafka"`)
-
-| Field | Purpose |
-| :--- | :--- |
-| `KafkaBrokers` | List of brokers (e.g., `[]string{"localhost:9092"}`) |
-| `KafkaConsumerGroup` | Consumer group name for subscriptions |
-| `KafkaClientID` | Optional producer identifier |
-
-### RabbitMQ (`"rabbitmq"`)
-
-| Field | Purpose |
-| :--- | :--- |
-| `RabbitMQURL` | Connection URL (e.g., `amqp://user:pass@host:5672/vhost`) |
-
 ### AWS SNS/SQS (`"aws"`)
 
 | Field | Purpose |
@@ -29,14 +15,6 @@ Set `Config.PubSubSystem` to one of the built-in transports and configure the re
 | `AWSEndpoint` | Override endpoint (useful for LocalStack) |
 | `AWSAccessKeyID` | Explicit credentials (optional) |
 | `AWSSecretAccessKey` | Explicit credentials (optional) |
-
-### NATS (`"nats"`)
-
-| Field | Purpose |
-| :--- | :--- |
-| `NATSURL` | Connection URL (e.g., `nats://localhost:4222`) |
-| `NATSClusterID` | Cluster ID (for NATS Streaming/JetStream) |
-| `NATSClientID` | Client ID |
 
 ### Go Channel (`"channel"`)
 
