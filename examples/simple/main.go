@@ -63,19 +63,20 @@ func main() {
 	}
 
 	if err := svc.Start(ctx); err != nil && !errors.Is(err, context.Canceled) {
-		logger.Error("router stopped", err, protoflow.LogFields{"handler": "raw-logger"})
+		logger.Error(context.Background(), "router stopped", err, protoflow.LogFields{"handler": "raw-logger"})
 	}
 }
 
 func createHandler(logger protoflow.ServiceLogger) func(msg *message.Message) ([]*message.Message, error) {
 	return func(msg *message.Message) ([]*message.Message, error) {
+		ctx := msg.Context()
 		// Simulate a temporary failure for demonstration
 		if msg.Metadata.Get("simulate_error") == "true" {
-			logger.Info("simulating temporary error", nil)
+			logger.Info(ctx, "simulating temporary error", nil)
 			return nil, ErrTemporary
 		}
 
-		logger.Info("received raw event", protoflow.LogFields{
+		logger.Info(ctx, "received raw event", protoflow.LogFields{
 			"payload":  string(msg.Payload),
 			"metadata": msg.Metadata,
 		})

@@ -81,7 +81,7 @@ func registerHandlers(svc *protoflow.Service) {
 		ConsumeQueue: "raw.audit",
 		PublishQueue: "raw.archive",
 		Handler: func(msg *message.Message) ([]*message.Message, error) {
-			svc.Logger.Info("raw handler", protoflow.LogFields{"message_id": msg.UUID})
+			svc.Logger.Info(msg.Context(), "raw handler", protoflow.LogFields{"message_id": msg.UUID})
 			return nil, nil
 		},
 	}))
@@ -93,7 +93,7 @@ func registerHandlers(svc *protoflow.Service) {
 				return func(msg *message.Message) ([]*message.Message, error) {
 					start := time.Now()
 					out, err := h(msg)
-					s.Logger.Info("handler completed", protoflow.LogFields{
+					s.Logger.Info(msg.Context(), "handler completed", protoflow.LogFields{
 						"duration_ms": time.Since(start).Milliseconds(),
 						"message_id":  msg.UUID,
 					})
@@ -123,7 +123,7 @@ func startSamplePublisher(ctx context.Context, svc *protoflow.Service) {
 
 func runService(ctx context.Context, svc *protoflow.Service, logger protoflow.ServiceLogger) {
 	if err := svc.Start(ctx); err != nil && !errors.Is(err, context.Canceled) {
-		logger.Error("router stopped", err, protoflow.LogFields{"example": "full"})
+		logger.Error(context.Background(), "router stopped", err, protoflow.LogFields{"example": "full"})
 	}
 }
 
@@ -171,7 +171,7 @@ func metricsMiddleware() protoflow.MiddlewareRegistration {
 				return func(msg *message.Message) ([]*message.Message, error) {
 					start := time.Now()
 					events, err := h(msg)
-					s.Logger.Debug("metrics", protoflow.LogFields{
+					s.Logger.Debug(msg.Context(), "metrics", protoflow.LogFields{
 						"duration_ms": time.Since(start).Milliseconds(),
 						"published":   len(events),
 					})

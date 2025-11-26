@@ -296,7 +296,7 @@ func (s *Service) poisonMiddlewareWithFilter(filter func(err error) bool) (messa
 func (s *Service) logMessagesMiddleware(logger loggingpkg.ServiceLogger) message.HandlerMiddleware {
 	return func(h message.HandlerFunc) message.HandlerFunc {
 		return func(msg *message.Message) ([]*message.Message, error) {
-			logger.Debug("Processing message", loggingpkg.LogFields{
+			logger.Debug(msg.Context(), "Processing message", loggingpkg.LogFields{
 				"message_uuid": msg.UUID,
 				"payload":      string(msg.Payload),
 				"metadata":     msg.Metadata,

@@ -1,6 +1,7 @@
 package protoflow
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -34,7 +35,7 @@ func TestProtoMessageHelpers(t *testing.T) {
 
 func TestLoggerExports(t *testing.T) {
 	logger := NewEntryServiceLogger(&stubEntry{})
-	logger.Info("boot", LogFields{"component": "test"})
+	logger.Info(context.Background(), "boot", LogFields{"component": "test"})
 }
 
 func TestEncodingExportAliases(t *testing.T) {
@@ -62,10 +63,10 @@ type stubEntry struct {
 	err    error
 }
 
-func (s *stubEntry) Error(args ...any) {}
-func (s *stubEntry) Info(args ...any)  {}
-func (s *stubEntry) Debug(args ...any) {}
-func (s *stubEntry) Trace(args ...any) {}
+func (s *stubEntry) Error(_ context.Context, args ...any) {}
+func (s *stubEntry) Info(_ context.Context, args ...any)  {}
+func (s *stubEntry) Debug(_ context.Context, args ...any) {}
+func (s *stubEntry) Trace(_ context.Context, args ...any) {}
 
 func (s *stubEntry) WithError(err error) *stubEntry {
 	clone := *s

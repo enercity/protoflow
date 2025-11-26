@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -13,15 +14,16 @@ func TestEntryServiceLoggerDelegates(t *testing.T) {
 	entry := newFakeEntry()
 	logger := NewEntryServiceLogger(entry)
 
-	logger.Info("boot", LogFields{"system": "test"})
+	ctx := context.Background()
+	logger.Info(ctx, "boot", LogFields{"system": "test"})
 
 	child := logger.With(LogFields{"base": "value"})
-	child.Debug("child", LogFields{"child": "value"})
+	child.Debug(ctx, "child", LogFields{"child": "value"})
 
 	boom := errors.New("boom")
-	child.Error("child failed", boom, LogFields{"child": "value"})
+	child.Error(ctx, "child failed", boom, LogFields{"child": "value"})
 
-	child.Trace("trace", nil)
+	child.Trace(ctx, "trace", nil)
 
 	logs := entry.recorder.logs
 	if len(logs) != 4 {
@@ -64,7 +66,7 @@ func TestEntryServiceLoggerWithNilFields(t *testing.T) {
 	entry := newFakeEntry()
 	logger := NewEntryServiceLogger(entry)
 	child := logger.With(nil)
-	child.Info("test", nil)
+	child.Info(context.Background(), "test", nil)
 
 	if len(entry.recorder.logs) != 1 {
 		t.Fatalf("expected 1 log entry, got %d", len(entry.recorder.logs))
@@ -75,17 +77,18 @@ func TestWatermillServiceLoggerDelegates(t *testing.T) {
 	base := newRecordingWatermillLogger()
 	logger := NewWatermillServiceLogger(base)
 
-	logger.Debug("dbg", LogFields{"component": "watermill"})
-	logger.Info("info", nil)
-	logger.Trace("trace", LogFields{"trace": true})
-	logger.Error("oops", errors.New("boom"), LogFields{"failed": true})
+	ctx := context.Background()
+	logger.Debug(ctx, "dbg", LogFields{"component": "watermill"})
+	logger.Info(ctx, "info", nil)
+	logger.Trace(ctx, "trace", LogFields{"trace": true})
+	logger.Error(ctx, "oops", errors.New("boom"), LogFields{"failed": true})
 
 	child := logger.With(LogFields{"child": "yes"})
 	typedChild, ok := child.(*watermillServiceLogger)
 	if !ok {
 		t.Fatal("expected watermill service logger")
 	}
-	typedChild.Info("child_info", nil)
+	typedChild.Info(ctx, "child_info", nil)
 
 	if len(base.entries) != 6 {
 		t.Fatalf("expected 6 log entries, got %d", len(base.entries))
@@ -189,7 +192,7 @@ func TestWatermillFieldConversions(t *testing.T) {
 func TestNewSlogServiceLoggerWrapsSlog(t *testing.T) {
 	base := slog.New(slog.NewTextHandler(testWriter{}, nil))
 	logger := NewSlogServiceLogger(base)
-	logger.Info("hello", LogFields{"k": "v"})
+	logger.Info(context.Background(), "hello", LogFields{"k": "v"})
 }
 
 type recordingWatermillLogger struct {
@@ -256,19 +259,19 @@ func (r *recordingServiceLogger) With(fields LogFields) ServiceLogger {
 	return cloned
 }
 
-func (r *recordingServiceLogger) Debug(msg string, fields LogFields) {
+func (r *recordingServiceLogger) Debug(_ context.Context, msg string, fields LogFields) {
 	r.entries = append(r.entries, loggedEntry{level: "debug", msg: msg, fields: fields})
 }
 
-func (r *recordingServiceLogger) Info(msg string, fields LogFields) {
+func (r *recordingServiceLogger) Info(_ context.Context, msg string, fields LogFields) {
 	r.entries = append(r.entries, loggedEntry{level: "info", msg: msg, fields: fields})
 }
 
-func (r *recordingServiceLogger) Error(msg string, err error, fields LogFields) {
+func (r *recordingServiceLogger) Error(_ context.Context, msg string, err error, fields LogFields) {
 	r.entries = append(r.entries, loggedEntry{level: "error", msg: msg, fields: fields, err: err})
 }
 
-func (r *recordingServiceLogger) Trace(msg string, fields LogFields) {
+func (r *recordingServiceLogger) Trace(_ context.Context, msg string, fields LogFields) {
 	r.entries = append(r.entries, loggedEntry{level: "trace", msg: msg, fields: fields})
 }
 
@@ -291,19 +294,19 @@ func (f *fakeEntry) clone() *fakeEntry {
 	return &fakeEntry{recorder: f.recorder, fields: clonedFields, err: f.err}
 }
 
-func (f *fakeEntry) Error(args ...any) {
+func (f *fakeEntry) Error(_ context.Context, args ...any) {
 	f.append("error", args...)
 }
 
-func (f *fakeEntry) Info(args ...any) {
+func (f *fakeEntry) Info(_ context.Context, args ...any) {
 	f.append("info", args...)
 }
 
-func (f *fakeEntry) Debug(args ...any) {
+func (f *fakeEntry) Debug(_ context.Context, args ...any) {
 	f.append("debug", args...)
 }
 
-func (f *fakeEntry) Trace(args ...any) {
+func (f *fakeEntry) Trace(_ context.Context, args ...any) {
 	f.append("trace", args...)
 }
 

@@ -1,6 +1,7 @@
 package runtime
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"testing"
@@ -12,15 +13,16 @@ func TestEntryServiceLogger(t *testing.T) {
 	entry := newFakeEntry()
 	logger := loggingpkg.NewEntryServiceLogger(entry)
 
-	logger.Info("boot", loggingpkg.LogFields{"system": "test"})
+	ctx := context.Background()
+	logger.Info(ctx, "boot", loggingpkg.LogFields{"system": "test"})
 
 	child := logger.With(loggingpkg.LogFields{"base": "value"})
-	child.Debug("child", loggingpkg.LogFields{"child": "value"})
+	child.Debug(ctx, "child", loggingpkg.LogFields{"child": "value"})
 
 	boom := errors.New("boom")
-	child.Error("child failed", boom, loggingpkg.LogFields{"child": "value"})
+	child.Error(ctx, "child failed", boom, loggingpkg.LogFields{"child": "value"})
 
-	child.Trace("trace", nil)
+	child.Trace(ctx, "trace", nil)
 
 	logs := entry.recorder.logs
 	if len(logs) != 4 {
@@ -76,19 +78,19 @@ func (f *fakeEntry) clone() *fakeEntry {
 	return &fakeEntry{recorder: f.recorder, fields: clonedFields, err: f.err}
 }
 
-func (f *fakeEntry) Error(args ...any) {
+func (f *fakeEntry) Error(_ context.Context, args ...any) {
 	f.append("error", args...)
 }
 
-func (f *fakeEntry) Info(args ...any) {
+func (f *fakeEntry) Info(_ context.Context, args ...any) {
 	f.append("info", args...)
 }
 
-func (f *fakeEntry) Debug(args ...any) {
+func (f *fakeEntry) Debug(_ context.Context, args ...any) {
 	f.append("debug", args...)
 }
 
-func (f *fakeEntry) Trace(args ...any) {
+func (f *fakeEntry) Trace(_ context.Context, args ...any) {
 	f.append("trace", args...)
 }
 

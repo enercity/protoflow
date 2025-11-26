@@ -70,7 +70,7 @@ type Service struct {
 // on the returned Service before calling Start.
 func NewService(conf *configpkg.Config, log loggingpkg.ServiceLogger, ctx context.Context, deps ServiceDependencies) *Service {
 	wmLogger := loggingpkg.NewWatermillAdapter(log)
-	log.Info("Creating event service",
+	log.Info(ctx, "Creating event service",
 		loggingpkg.LogFields{
 			"pubsub_system": conf.PubSubSystem,
 			"config":        conf,
@@ -180,10 +180,10 @@ func (s *Service) startHTTPServers() {
 
 	for port, mux := range s.httpServers {
 		addr := fmt.Sprintf(":%d", port)
-		s.Logger.Info("Starting HTTP server", loggingpkg.LogFields{"address": addr})
+		s.Logger.Info(context.Background(), "Starting HTTP server", loggingpkg.LogFields{"address": addr})
 		go func(addr string, handler http.Handler) {
 			if err := http.ListenAndServe(addr, handler); err != nil {
-				s.Logger.Error("Failed to start HTTP server", err, loggingpkg.LogFields{"address": addr})
+				s.Logger.Error(context.Background(), "Failed to start HTTP server", err, loggingpkg.LogFields{"address": addr})
 			}
 		}(addr, mux)
 	}

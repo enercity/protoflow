@@ -50,6 +50,6 @@ func main() {
 	}
 
 	if err := svc.Start(ctx); err != nil && !errors.Is(err, context.Canceled) {
-		logger.Error("router stopped", err, protoflow.LogFields{"handler": "proto-orders"})
+		logger.Error(context.Background(), "router stopped", err, protoflow.LogFields{"handler": "proto-orders"})
 	}
 }

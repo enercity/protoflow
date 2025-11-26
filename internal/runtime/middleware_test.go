@@ -201,13 +201,13 @@ type recordingServiceLogger struct {
 
 func (r *recordingServiceLogger) With(fields loggingpkg.LogFields) loggingpkg.ServiceLogger { return r }
 
-func (r *recordingServiceLogger) Debug(string, loggingpkg.LogFields) { r.debugs++ }
+func (r *recordingServiceLogger) Debug(_ context.Context, _ string, _ loggingpkg.LogFields) { r.debugs++ }
 
-func (r *recordingServiceLogger) Info(string, loggingpkg.LogFields) { r.infos++ }
+func (r *recordingServiceLogger) Info(_ context.Context, _ string, _ loggingpkg.LogFields) { r.infos++ }
 
-func (r *recordingServiceLogger) Error(string, error, loggingpkg.LogFields) {}
+func (r *recordingServiceLogger) Error(_ context.Context, _ string, _ error, _ loggingpkg.LogFields) {}
 
-func (r *recordingServiceLogger) Trace(string, loggingpkg.LogFields) {}
+func (r *recordingServiceLogger) Trace(_ context.Context, _ string, _ loggingpkg.LogFields) {}
 
 func (r *recordingServiceLogger) debugCount() int { return r.debugs }
 
@@ -615,18 +615,19 @@ func getFreePort() (int, error) {
 
 type mockLogger struct{}
 
-func (m mockLogger) With(fields loggingpkg.LogFields) loggingpkg.ServiceLogger { return m }
-func (m mockLogger) Debug(msg string, fields loggingpkg.LogFields)             {}
-func (m mockLogger) Info(msg string, fields loggingpkg.LogFields)              {}
-func (m mockLogger) Error(msg string, err error, fields loggingpkg.LogFields)  {}
-func (m mockLogger) Trace(msg string, fields loggingpkg.LogFields)             {}
+func (m mockLogger) With(fields loggingpkg.LogFields) loggingpkg.ServiceLogger       { return m }
+func (m mockLogger) Debug(_ context.Context, msg string, fields loggingpkg.LogFields) {}
+func (m mockLogger) Info(_ context.Context, msg string, fields loggingpkg.LogFields)  {}
+func (m mockLogger) Error(_ context.Context, msg string, err error, fields loggingpkg.LogFields) {
+}
+func (m mockLogger) Trace(_ context.Context, msg string, fields loggingpkg.LogFields) {}
 
 type capturingLogger struct {
 	mockLogger
 	msgs []string
 }
 
-func (c *capturingLogger) Info(msg string, fields loggingpkg.LogFields) {
+func (c *capturingLogger) Info(_ context.Context, msg string, fields loggingpkg.LogFields) {
 	c.msgs = append(c.msgs, msg)
 }
 

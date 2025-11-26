@@ -27,7 +27,7 @@ func (s *Service) handleGetHandlers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	if err := json.NewEncoder(w).Encode(s.handlers); err != nil {
-		s.Logger.Error("Failed to encode handlers", err, nil)
+		s.Logger.Error(r.Context(), "Failed to encode handlers", err, nil)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
 }

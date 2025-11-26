@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"context"
 	"log/slog"
 
 	"github.com/ThreeDotsLabs/watermill"
@@ -14,10 +15,10 @@ type LogFields map[string]any
 // their existing loggers without depending on slog.
 type ServiceLogger interface {
 	With(fields LogFields) ServiceLogger
-	Debug(msg string, fields LogFields)
-	Info(msg string, fields LogFields)
-	Error(msg string, err error, fields LogFields)
-	Trace(msg string, fields LogFields)
+	Debug(ctx context.Context, msg string, fields LogFields)
+	Info(ctx context.Context, msg string, fields LogFields)
+	Error(ctx context.Context, msg string, err error, fields LogFields)
+	Trace(ctx context.Context, msg string, fields LogFields)
 }
 
 // EntryLogger represents the legacy non-generic entry adapter constraint. It
@@ -32,11 +33,12 @@ type EntryLogger interface {
 // NewEntryServiceLogger. The constraint is generic so third-party entry-like
 // loggers (for example, loggers whose methods return their own concrete
 // interface type) can be used without additional wrappers.
+// Compatible with github.com/enercity/lib-logger/v4.Entry interface.
 type EntryLoggerAdapter[T any] interface {
-	Error(args ...any)
-	Info(args ...any)
-	Debug(args ...any)
-	Trace(args ...any)
+	Error(ctx context.Context, args ...any)
+	Info(ctx context.Context, args ...any)
+	Debug(ctx context.Context, args ...any)
+	Trace(ctx context.Context, args ...any)
 	WithError(err error) T
 	WithField(key string, value any) T
 }
@@ -91,43 +93,43 @@ func (e *entryServiceLogger[T]) With(fields LogFields) ServiceLogger {
 	return &entryServiceLogger[T]{entry: applyEntryFields(e.entry, fields)}
 }
 
-func (e *entryServiceLogger[T]) Debug(msg string, fields LogFields) {
-	applyEntryFields(e.entry, fields).Debug(msg)
+func (e *entryServiceLogger[T]) Debug(ctx context.Context, msg string, fields LogFields) {
+	applyEntryFields(e.entry, fields).Debug(ctx, msg)
 }
 
-func (e *entryServiceLogger[T]) Info(msg string, fields LogFields) {
-	applyEntryFields(e.entry, fields).Info(msg)
+func (e *entryServiceLogger[T]) Info(ctx context.Context, msg string, fields LogFields) {
+	applyEntryFields(e.entry, fields).Info(ctx, msg)
 }
 
-func (e *entryServiceLogger[T]) Error(msg string, err error, fields LogFields) {
+func (e *entryServiceLogger[T]) Error(ctx context.Context, msg string, err error, fields LogFields) {
 	logger := applyEntryFields(e.entry, fields)
 	if err != nil {
 		logger = logger.WithError(err)
 	}
-	logger.Error(msg)
+	logger.Error(ctx, msg)
 }
 
-func (e *entryServiceLogger[T]) Trace(msg string, fields LogFields) {
-	applyEntryFields(e.entry, fields).Trace(msg)
+func (e *entryServiceLogger[T]) Trace(ctx context.Context, msg string, fields LogFields) {
+	applyEntryFields(e.entry, fields).Trace(ctx, msg)
 }
 
 func (w *watermillServiceLogger) With(fields LogFields) ServiceLogger {
 	return &watermillServiceLogger{inner: w.inner.With(toWatermillFields(fields))}
 }
 
-func (w *watermillServiceLogger) Debug(msg string, fields LogFields) {
+func (w *watermillServiceLogger) Debug(_ context.Context, msg string, fields LogFields) {
 	w.inner.Debug(msg, toWatermillFields(fields))
 }
 
-func (w *watermillServiceLogger) Info(msg string, fields LogFields) {
+func (w *watermillServiceLogger) Info(_ context.Context, msg string, fields LogFields) {
 	w.inner.Info(msg, toWatermillFields(fields))
 }
 
-func (w *watermillServiceLogger) Error(msg string, err error, fields LogFields) {
+func (w *watermillServiceLogger) Error(_ context.Context, msg string, err error, fields LogFields) {
 	w.inner.Error(msg, err, toWatermillFields(fields))
 }
 
-func (w *watermillServiceLogger) Trace(msg string, fields LogFields) {
+func (w *watermillServiceLogger) Trace(_ context.Context, msg string, fields LogFields) {
 	w.inner.Trace(msg, toWatermillFields(fields))
 }
 
@@ -145,19 +147,19 @@ func NewWatermillAdapter(log ServiceLogger) watermill.LoggerAdapter {
 }
 
 func (s *serviceLoggerAdapter) Error(msg string, err error, fields watermill.LogFields) {
-	s.base.Error(msg, err, fromWatermillFields(fields))
+	s.base.Error(context.Background(), msg, err, fromWatermillFields(fields))
 }
 
 func (s *serviceLoggerAdapter) Info(msg string, fields watermill.LogFields) {
-	s.base.Info(msg, fromWatermillFields(fields))
+	s.base.Info(context.Background(), msg, fromWatermillFields(fields))
 }
 
 func (s *serviceLoggerAdapter) Debug(msg string, fields watermill.LogFields) {
-	s.base.Debug(msg, fromWatermillFields(fields))
+	s.base.Debug(context.Background(), msg, fromWatermillFields(fields))
 }
 
 func (s *serviceLoggerAdapter) Trace(msg string, fields watermill.LogFields) {
-	s.base.Trace(msg, fromWatermillFields(fields))
+	s.base.Trace(context.Background(), msg, fromWatermillFields(fields))
 }
 
 func (s *serviceLoggerAdapter) With(fields watermill.LogFields) watermill.LoggerAdapter {
